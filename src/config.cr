@@ -30,18 +30,6 @@ ActionController::Server.before(
   HTTP::CompressHandler.new
 )
 
-# Optional support for serving of static assests
-static_file_path = ENV["PUBLIC_WWW_PATH"]? || "./www"
-if File.directory?(static_file_path)
-  # Optionally add additional mime types
-  ::MIME.register(".yaml", "text/yaml")
-
-  # Check for files if no paths matched in your application
-  ActionController::Server.before(
-    ::HTTP::StaticFileHandler.new(static_file_path, directory_listing: false)
-  )
-end
-
 # Configure session cookies
 # NOTE:: Change these from defaults
 ActionController::Session.configure do |settings|
@@ -51,5 +39,5 @@ ActionController::Session.configure do |settings|
   settings.secure = ENV["SG_ENV"]? == "production"
 end
 
-APP_NAME = "Spider-Gazelle"
+APP_NAME = "Engine Triggers"
 VERSION  = "1.0.0"

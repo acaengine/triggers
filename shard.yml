@@ -2,16 +2,22 @@ name: app
 version: 1.0.0
 
 dependencies:
+  # Webhook support
   action-controller:
     github: spider-gazelle/action-controller
-    version: "~> 1.4.6"
+    version: "~> 1.6.0"
   active-model:
     github: spider-gazelle/active-model
 
-  # https://github.com/jeromegn/kilt
-  # Generic template interface for Crystal
-  kilt:
-    github: jeromegn/kilt
+  # Trigger models in the DB
+  engine-models:
+    github: aca-labs/crystal-engine-models
+    branch: master
+
+  # Access to state in Redis
+  engine-driver:
+    github: aca-labs/crystal-engine-driver
+    branch: master
 
 development_dependencies:
   ameba:
