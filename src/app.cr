@@ -1,4 +1,5 @@
 require "option_parser"
+
 require "./config"
 
 # Server defaults
@@ -9,7 +10,7 @@ process_count = 1
 
 # Command line options
 OptionParser.parse(ARGV.dup) do |parser|
-  parser.banner = "Usage: #{PROGRAM_NAME} [arguments]"
+  parser.banner = "Usage: #{ACAEngine::Triggers::APP_NAME} [arguments]"
 
   parser.on("-b HOST", "--bind=HOST", "Specifies the server host") { |h| host = h }
   parser.on("-p PORT", "--port=PORT", "Specifies the server port") { |p| port = p.to_i }
@@ -25,7 +26,7 @@ OptionParser.parse(ARGV.dup) do |parser|
   end
 
   parser.on("-v", "--version", "Display the application version") do
-    puts "#{APP_NAME} v#{VERSION}"
+    puts "#{ACAEngine::Triggers::APP_NAME} v#{ACAEngine::Triggers::VERSION}"
     exit 0
   end
 
@@ -36,7 +37,7 @@ OptionParser.parse(ARGV.dup) do |parser|
 end
 
 # Load the routes
-puts "Launching #{APP_NAME} v#{VERSION}"
+puts "Launching #{ACAEngine::Triggers::APP_NAME} v#{ACAEngine::Triggers::VERSION}"
 server = ActionController::Server.new(port, host)
 
 # Start clustering
@@ -53,10 +54,23 @@ Signal::INT.trap &terminate
 # Docker containers use the term signal
 Signal::TERM.trap &terminate
 
+# Allow signals to change the log level at run-time
+logging = Proc(Signal, Nil).new do |signal|
+  level = signal.usr1? ? Logger::DEBUG : Logger::INFO
+  puts " > Log level changed to #{level}"
+  ActionController::Base.settings.logger.level = level
+  signal.ignore
+end
+
+# Turn on DEBUG level logging `kill -s USR1 %PID`
+# Default production log levels (INFO and above) `kill -s USR2 %PID`
+Signal::USR1.trap &logging
+Signal::USR2.trap &logging
+
 # Start the server
 server.run do
   puts "Listening on #{server.print_addresses}"
 end
 
 # Shutdown message
-puts "#{APP_NAME} leaps through the veldt\n"
+puts "#{ACAEngine::Triggers::APP_NAME} leaps through the veldt\n"

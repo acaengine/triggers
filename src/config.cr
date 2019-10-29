@@ -1,43 +1,32 @@
 # Application dependencies
 require "action-controller"
-require "active-model"
+PROD = ENV["SG_ENV"]? == "production"
 
-# Allows request IDs to be configured for logging
-# You can extend this with additional properties
-class HTTP::Request
-  property id : String?
-end
+# Logging configuration
+ActionController::Logger.add_tag request_id
+logger = ActionController::Base.settings.logger
+logger.level = PROD ? Logger::INFO : Logger::DEBUG
+
+# Required to convince Crystal this file is not a module
+abstract class ACAEngine::Driver; end
+
+class ACAEngine::Driver::Protocol; end
 
 # Application code
+require "./constants"
 require "./controllers/application"
 require "./controllers/*"
-require "./models/*"
+require "./engine-triggers"
 
 # Server required after application controllers
 require "action-controller/server"
 
+# Filter out sensitive params that shouldn't be logged
+filter_params = ["password", "bearer_token"]
+
 # Add handlers that should run before your application
 ActionController::Server.before(
-  HTTP::ErrorHandler.new(ENV["SG_ENV"]? != "production"),
-  ActionController::LogHandler.new(STDOUT) { |context|
-    # Allows for custom tags to be included when logging
-    # For example you might want to include a user id here.
-    {
-      # `context.request.id` is set in `controllers/application`
-      request_id: context.request.id
-    }.map { |key, value| " #{key}=#{value}" }.join("")
-  },
+  HTTP::ErrorHandler.new(!PROD),
+  ActionController::LogHandler.new(PROD ? filter_params : nil),
   HTTP::CompressHandler.new
 )
-
-# Configure session cookies
-# NOTE:: Change these from defaults
-ActionController::Session.configure do |settings|
-  settings.key = ENV["COOKIE_SESSION_KEY"]? || "_spider_gazelle_"
-  settings.secret = ENV["COOKIE_SESSION_SECRET"]? || "4f74c0b358d5bab4000dd3c75465dc2c"
-  # HTTPS only:
-  settings.secure = ENV["SG_ENV"]? == "production"
-end
-
-APP_NAME = "Engine Triggers"
-VERSION  = "1.0.0"

@@ -1,23 +1,18 @@
-FROM crystallang/crystal:latest
-ADD . /src
-WORKDIR /src
+FROM crystallang/crystal:0.31.1
 
-# Build App
-RUN shards build --production
+WORKDIR /app
 
-# Run tests
-RUN crystal spec
+# Install shards for caching
+COPY shard.yml shard.yml
+RUN shards install --production
 
-# Extract dependencies
-RUN ldd bin/app | tr -s '[:blank:]' '\n' | grep '^/' | \
-    xargs -I % sh -c 'mkdir -p $(dirname deps%); cp % deps%;'
+# Add src
+COPY ./src /app/src
 
-# Build a minimal docker image
-FROM scratch
-COPY --from=0 /src/deps /
-COPY --from=0 /src/bin/app /app
+# Build application
+RUN crystal build --relese /app/src/app.cr -o engine-triggers
 
-# Run the app binding on port 8080
-EXPOSE 8080
-ENTRYPOINT ["/app"]
-CMD ["/app", "-b", "0.0.0.0", "-p", "8080"]
+# Run the app binding on port 3000
+EXPOSE 3000
+HEALTHCHECK CMD wget --spider localhost:3000/
+CMD ["/app/engine-triggers", "-b", "0.0.0.0", "-p", "3000"]

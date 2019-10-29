@@ -1,7 +1,8 @@
+module ACAEngine::Triggers::Api
+  class Webhook < Application
+    base "/api/triggers/v1/webhook"
 
-class Welcome < Application
-  base "/triggers/webhook"
-
-  def index
+    def index
+    end
   end
 end
