@@ -6,4 +6,3 @@ app
 *.dwarf
 bin
 rethinkdb_data
-shard.lock
