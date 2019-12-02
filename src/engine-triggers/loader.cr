@@ -10,8 +10,8 @@ module ACAEngine::Triggers
     @instances = {} of String => State
 
     def load!
-      spawn { watch_triggers! }
-      spawn { watch_instances! }
+      spawn(same_thread: true) { watch_triggers! }
+      spawn(same_thread: true) { watch_instances! }
 
       Fiber.yield
 

@@ -7,7 +7,7 @@ module ACAEngine::Triggers
       @trigger_id = @trigger.id.not_nil!
       @instance_id = @instance.id.not_nil!
 
-      spawn { monitor! }
+      spawn(same_thread: true) { monitor! }
     end
 
     getter trigger_id : String
