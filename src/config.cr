@@ -1,4 +1,5 @@
 # Application dependencies
+require "email"
 require "action-controller"
 PROD = ENV["SG_ENV"]? == "production"
 
@@ -30,3 +31,20 @@ ActionController::Server.before(
   ActionController::LogHandler.new(PROD ? filter_params : nil),
   HTTP::CompressHandler.new
 )
+
+# Set SMTP client configuration
+SMTP_CONFIG = EMail::Client::Config.new(
+  ENV["SMTP_SERVER"]? || "smtp.example.com",
+  (ENV["SMTP_PORT"]? || 25).to_i
+)
+
+user_name = ENV["SMTP_USER"]? || ""
+user_pass = ENV["SMTP_PASS"]? || ""
+smtp_tls = (ENV["SMTP_SECURE"]? || "false") == "true"
+
+SMTP_CONFIG.logger = logger
+SMTP_CONFIG.use_auth(user_name, user_pass) unless user_pass.empty?
+#SMTP_CONFIG.use_tls = smtp_tls
+
+LOADER = ACAEngine::Triggers::Loader.new
+LOADER.load!

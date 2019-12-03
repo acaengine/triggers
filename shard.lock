@@ -6,15 +6,15 @@ shards:
 
   action-controller:
     github: spider-gazelle/action-controller
-    version: 2.0.2
+    version: 2.1.0
 
   active-model:
     github: spider-gazelle/active-model
-    version: 1.6.0
+    commit: 339ec3f53aaf863cf5c70937161320bab459ce28
 
   ameba:
     github: crystal-ameba/ameba
-    version: 0.10.1
+    version: 0.11.0
 
   bisect:
     github: spider-gazelle/bisect
@@ -29,20 +29,32 @@ shards:
     version: 0.2.0
 
   crystal-rethinkdb:
-    github: caspiano/crystal-rethinkdb
-    commit: d7c3195db9ad0db7e5cfe4150d65615afbbad636
+    github: kingsleyh/crystal-rethinkdb
+    version: 0.1.10
+
+  email:
+    github: arcage/crystal-email
+    version: 0.4.3
 
   engine-driver:
     github: aca-labs/crystal-engine-driver
-    commit: 1176541d189384acbd797dddd97b317753a1ff29
+    commit: 9d55cf0244de5f87e6a87378a3edcefcd43e6989
 
   engine-models:
     github: aca-labs/crystal-engine-models
-    commit: 3e2463582823a852b52eba7d08565ad75e9d57b3
+    commit: ed4fbc26961501a0800f4913f2924c03706dd2f8
+
+  etcd:
+    github: aca-labs/crystal-etcd
+    commit: 25a02e60f32a8de6609cee4dbbec07698878f102
 
   habitat:
     github: luckyframework/habitat
     version: 0.4.3
+
+  hound-dog:
+    github: aca-labs/hound-dog
+    commit: e6a5590ab2c71cd8f3569b43768d8035d9314ba4
 
   ipaddress:
     github: Sija/ipaddress.cr
@@ -54,7 +66,11 @@ shards:
 
   kilt:
     github: jeromegn/kilt
-    version: 0.5.0
+    version: 0.6.0
+
+  murmur3:
+    github: aca-labs/murmur3
+    commit: 7cbe25c0ca8d052c9d98c377c824dcb0e038c790
 
   neuroplastic:
     github: aca-labs/neuroplastic
@@ -88,9 +104,13 @@ shards:
     github: stefanwille/crystal-redis
     version: 2.2.1
 
+  rendezvous-hash:
+    github: caspiano/rendezvous-hash
+    version: 0.2.1
+
   rethinkdb-orm:
     github: spider-gazelle/rethinkdb-orm
-    commit: bdb4dca0a78ff5c342f26f9f24c7f23440896046
+    commit: e3655f6b9a25d932c27f32cbaf847b2668bb1f6d
 
   retriable:
     github: Sija/retriable.cr
@@ -98,7 +118,7 @@ shards:
 
   ssh2:
     github: spider-gazelle/ssh2.cr
-    commit: fd9946c951eea33636b38cac999c6deeb0ca28ef
+    commit: 71573443ff24a2ce727f0e8998bc0f65ca9da216
 
   tasker:
     github: spider-gazelle/tasker

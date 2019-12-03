@@ -11,10 +11,6 @@ dependencies:
     github: spider-gazelle/action-controller
     version: ~> 2.0
 
-  # Validation
-  active-model:
-    github: spider-gazelle/active-model
-
   # Driver State
   engine-driver:
     github: aca-labs/crystal-engine-driver
@@ -24,6 +20,20 @@ dependencies:
   engine-models:
     github: aca-labs/crystal-engine-models
     branch: master
+
+  # timers / scheduling
+  tasker:
+    github: spider-gazelle/tasker
+    version: ~> 1.2
+
+  # Service discovery
+  hound-dog:
+    github: aca-labs/hound-dog
+    branch: master
+
+  email:
+    github: arcage/crystal-email
+    version: ~> 0.4
 
 development_dependencies:
   ameba:
