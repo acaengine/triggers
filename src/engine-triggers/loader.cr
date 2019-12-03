@@ -10,12 +10,12 @@ module ACAEngine::Triggers
     @instances = {} of String => State
 
     def load!
-      spawn { watch_triggers! }
-      spawn { watch_instances! }
-
+      spawn(same_thread: true) { watch_triggers! }
+      spawn(same_thread: true) { watch_instances! }
+      spawn(same_thread: true) do
+        Model::TriggerInstance.all.each &->new_instance(Model::TriggerInstance)
+      end
       Fiber.yield
-
-      Model::TriggerInstance.all.each &->new_instance(Model::TriggerInstance)
     end
 
     private def watch_triggers!
@@ -31,16 +31,18 @@ module ACAEngine::Triggers
             state.terminate!
           end
         when RethinkORM::Changefeed::Event::Created
-          @trigger_cache[trigger.id] = trigger
+          @trigger_cache[trigger.id.not_nil!] = trigger
         when RethinkORM::Changefeed::Event::Updated
-          @trigger_cache[trigger.id] = trigger
+          @trigger_cache[trigger.id.not_nil!] = trigger
           states = @trigger_map.delete(trigger.id)
-          states.each do |state|
-            instance = state.instance
-            @instances.delete(instance.id)
-            state.terminate!
+          if states
+            states.each do |state|
+              instance = state.instance
+              @instances.delete(instance.id)
+              state.terminate!
 
-            new_instance(trigger, instance)
+              new_instance(trigger, instance)
+            end
           end
         end
       end
@@ -63,7 +65,7 @@ module ACAEngine::Triggers
     end
 
     def new_instance(instance)
-      trigger_id = instance.trigger_id
+      trigger_id = instance.trigger_id.not_nil!
       trig = @trigger_cache[trigger_id]?
       trigger = if trig
                   trig
@@ -75,8 +77,9 @@ module ACAEngine::Triggers
     end
 
     def new_instance(trigger, instance)
+      trigger_id = trigger.id.not_nil!
       state = State.new trigger, instance
-      @instances[instance.id] = state
+      @instances[instance.id.not_nil!] = state
       states = @trigger_map[trigger_id]?
       if states
         states << state

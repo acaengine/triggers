@@ -3,10 +3,9 @@ require "option_parser"
 require "./config"
 
 # Server defaults
-port = 3000
-host = "127.0.0.1"
-cluster = false
-process_count = 1
+port = (ENV["SG_SERVER_PORT"]? || 3000).to_i
+host = ENV["SG_SERVER_HOST"]? || "127.0.0.1"
+process_count = (ENV["SG_PROCESS_COUNT"]? || 1).to_i
 
 # Command line options
 OptionParser.parse(ARGV.dup) do |parser|
@@ -16,7 +15,6 @@ OptionParser.parse(ARGV.dup) do |parser|
   parser.on("-p PORT", "--port=PORT", "Specifies the server port") { |p| port = p.to_i }
 
   parser.on("-w COUNT", "--workers=COUNT", "Specifies the number of processes to handle requests") do |w|
-    cluster = true
     process_count = w.to_i
   end
 
@@ -41,7 +39,7 @@ puts "Launching #{ACAEngine::Triggers::APP_NAME} v#{ACAEngine::Triggers::VERSION
 server = ActionController::Server.new(port, host)
 
 # Start clustering
-server.cluster(process_count, "-w", "--workers") if cluster
+server.cluster(process_count, "-w", "--workers") if process_count != 1
 
 terminate = Proc(Signal, Nil).new do |signal|
   puts " > terminating gracefully"
@@ -50,8 +48,8 @@ terminate = Proc(Signal, Nil).new do |signal|
 end
 
 # Detect ctr-c to shutdown gracefully
-Signal::INT.trap &terminate
 # Docker containers use the term signal
+Signal::INT.trap &terminate
 Signal::TERM.trap &terminate
 
 # Allow signals to change the log level at run-time

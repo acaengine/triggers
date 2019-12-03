@@ -6,3 +6,4 @@ app
 *.dwarf
 bin
 rethinkdb_data
+*.DS_Store
