@@ -9,6 +9,8 @@ module ACAEngine::Triggers
     @trigger_map = {} of String => Array(State)
     @instances = {} of String => State
 
+    getter instances
+
     def load!
       spawn(same_thread: true) { watch_triggers! }
       spawn(same_thread: true) { watch_instances! }

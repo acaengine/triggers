@@ -38,6 +38,8 @@ module ACAEngine::Triggers
       @storage.clear
       @storage["state"] = %({"triggered":false})
       @conditions_met["triggered"] = false
+      # TODO:: add check for @trigger.webhook_enabled
+      @conditions_met["webhook"] = false # if webhook_enabled
 
       # New thread!
       spawn { monitor! }
@@ -165,47 +167,31 @@ module ACAEngine::Triggers
           # Potentially this should be done in sidekiq or similar?
         end
       end
-
-      # NOTE:: need to check the response to see how we should respond to webhooks
-      # Possibly a callback promise is put in place
     end
 
     def time_at(key, time)
-      @condition_timers << @schedule.at(time) do
-        if timer = @debounce_timers[key]?
-          timer.cancel
-        end
-
-        # Revert the status of this condition
-        @debounce_timers[key] = @schedule.in(59.seconds) do
-          @debounce_timers.delete key
-          @conditions_met[key] = false
-          update_state(false)
-        end
-
-        # Update status of this condition
-        @conditions_met[key] = true
-        check_trigger!
-      end
+      @condition_timers << @schedule.at(time) { temporary_condition_met(key) }
     end
 
     def time_cron(key, cron)
-      @condition_timers << @schedule.cron(cron) do
-        if timer = @debounce_timers[key]?
-          timer.cancel
-        end
+      @condition_timers << @schedule.cron(cron) { temporary_condition_met(key) }
+    end
 
-        # Revert the status of this condition
-        @debounce_timers[key] = @schedule.in(59.seconds) do
-          @debounce_timers.delete key
-          @conditions_met[key] = false
-          update_state(false)
-        end
-
-        # Update status of this condition
-        @conditions_met[key] = true
-        check_trigger!
+    def temporary_condition_met(key : String)
+      if timer = @debounce_timers[key]?
+        timer.cancel
       end
+
+      # Revert the status of this condition
+      @debounce_timers[key] = @schedule.in(59.seconds) do
+        @debounce_timers.delete key
+        @conditions_met[key] = false
+        update_state(false)
+      end
+
+      # Update status of this condition
+      @conditions_met[key] = true
+      check_trigger!
     end
   end
 end

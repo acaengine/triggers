@@ -1,5 +1,6 @@
 # Application dependencies
 require "email"
+require "active-model"
 require "action-controller"
 PROD = ENV["SG_ENV"]? == "production"
 

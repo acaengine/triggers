@@ -8,4 +8,10 @@ abstract class Application < ActionController::Base
   def set_request_id
     response.headers["X-Request-ID"] = logger.request_id = request.headers["X-Request-ID"]? || UUID.random.to_s
   end
+
+  # 404 if resource not present
+  rescue_from RethinkORM::Error::DocumentNotFound do |error|
+    logger.debug error.inspect_with_backtrace
+    head :not_found
+  end
 end
