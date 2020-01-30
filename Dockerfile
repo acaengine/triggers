@@ -1,4 +1,4 @@
-FROM crystallang/crystal:0.31.1
+FROM crystallang/crystal:0.32.1
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN shards install --production
 COPY ./src /app/src
 
 # Build application
-RUN crystal build --release /app/src/app.cr -o engine-triggers
+RUN crystal build --error-trace --release /app/src/app.cr -o engine-triggers
 
 # Run the app binding on port 3000
 EXPOSE 3000
