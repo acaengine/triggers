@@ -29,5 +29,5 @@ COPY --from=0 /etc/hosts /etc/hosts
 
 # Run the app binding on port 3000
 EXPOSE 3000
-HEALTHCHECK CMD ["/engine-triggers", "-h", "http://127.0.0.1:3000/"]
+HEALTHCHECK CMD ["/engine-triggers", "-c", "http://127.0.0.1:3000/"]
 CMD ["/engine-triggers", "-b", "0.0.0.0", "-p", "3000"]
