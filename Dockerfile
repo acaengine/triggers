@@ -25,6 +25,7 @@ COPY --from=0 /app/engine-triggers /engine-triggers
 # These are required for communicating with external services
 COPY --from=0 /lib/x86_64-linux-gnu/libnss_dns.so.2 /lib/x86_64-linux-gnu/libnss_dns.so.2
 COPY --from=0 /lib/x86_64-linux-gnu/libresolv.so.2 /lib/x86_64-linux-gnu/libresolv.so.2
+COPY --from=0 /etc/hosts /etc/hosts
 
 # Run the app binding on port 3000
 EXPOSE 3000
