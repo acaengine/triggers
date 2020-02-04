@@ -18,7 +18,7 @@ class ACAEngine::Driver::Protocol; end
 require "./constants"
 require "./controllers/application"
 require "./controllers/*"
-require "./engine-triggers"
+require "./engine-triggers/*"
 
 # Server required after application controllers
 require "action-controller/server"

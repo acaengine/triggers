@@ -38,8 +38,7 @@ module ACAEngine::Triggers
       @storage.clear
       @storage["state"] = %({"triggered":false})
       @conditions_met["triggered"] = false
-      # TODO:: add check for @trigger.webhook_enabled
-      @conditions_met["webhook"] = false # if webhook_enabled
+      @conditions_met["webhook"] = false if @trigger.enable_webhook
 
       # New thread!
       spawn { monitor! }
