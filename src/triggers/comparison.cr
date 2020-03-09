@@ -1,27 +1,27 @@
 require "./state"
 
-class ACAEngine::Triggers::State::Comparison
+class PlaceOS::Triggers::State::Comparison
   def initialize(
     @state : State,
     @condition_key : String,
     @system_id : String,
-    left : ACAEngine::Model::Trigger::Conditions::Comparison::Value,
+    left : PlaceOS::Model::Trigger::Conditions::Comparison::Value,
     @compare : String,
-    right : ACAEngine::Model::Trigger::Conditions::Comparison::Value
+    right : PlaceOS::Model::Trigger::Conditions::Comparison::Value
   )
     @left = case left
-            when ACAEngine::Model::Trigger::Conditions::Comparison::Constant
+            when PlaceOS::Model::Trigger::Conditions::Comparison::Constant
               Constant.new(left)
-            when ACAEngine::Model::Trigger::Conditions::Comparison::StatusVariable
+            when PlaceOS::Model::Trigger::Conditions::Comparison::StatusVariable
               Status.new(left)
             else
               raise "unsupported comparison type"
             end
 
     @right = case right
-             when ACAEngine::Model::Trigger::Conditions::Comparison::Constant
+             when PlaceOS::Model::Trigger::Conditions::Comparison::Constant
                Constant.new(right)
-             when ACAEngine::Model::Trigger::Conditions::Comparison::StatusVariable
+             when PlaceOS::Model::Trigger::Conditions::Comparison::StatusVariable
                Status.new(right)
              else
                raise "unsupported comparison type"
@@ -82,7 +82,7 @@ class ACAEngine::Triggers::State::Comparison
 
   class Status < Constant
     def initialize(
-      @status : ACAEngine::Model::Trigger::Conditions::Comparison::StatusVariable
+      @status : PlaceOS::Model::Trigger::Conditions::Comparison::StatusVariable
     )
       @value = nil
     end
@@ -90,7 +90,7 @@ class ACAEngine::Triggers::State::Comparison
     @value : JSON::Any::Type
 
     def bind!(comparison, subscriptions, system_id)
-      module_name, index = ACAEngine::Driver::Proxy::RemoteDriver.get_parts(@status.mod)
+      module_name, index = PlaceOS::Driver::Proxy::RemoteDriver.get_parts(@status.mod)
       subscriptions.subscribe(system_id, module_name, index, @status.status) do |_, data|
         val = JSON.parse(data)
 

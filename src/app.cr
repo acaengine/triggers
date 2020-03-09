@@ -1,9 +1,6 @@
 require "option_parser"
 require "http/client"
 
-module ACAEngine::Triggers
-end
-
 # Server defaults
 port = (ENV["SG_SERVER_PORT"]? || 3000).to_i
 host = ENV["SG_SERVER_HOST"]? || "127.0.0.1"
@@ -11,7 +8,7 @@ process_count = (ENV["SG_PROCESS_COUNT"]? || 1).to_i
 
 # Command line options
 OptionParser.parse(ARGV.dup) do |parser|
-  parser.banner = "Usage: #{ACAEngine::Triggers::APP_NAME} [arguments]"
+  parser.banner = "Usage: #{PlaceOS::Triggers::APP_NAME} [arguments]"
 
   parser.on("-b HOST", "--bind=HOST", "Specifies the server host") { |h| host = h }
   parser.on("-p PORT", "--port=PORT", "Specifies the server port") { |p| port = p.to_i }
@@ -26,7 +23,7 @@ OptionParser.parse(ARGV.dup) do |parser|
   end
 
   parser.on("-v", "--version", "Display the application version") do
-    puts "#{ACAEngine::Triggers::APP_NAME} v#{ACAEngine::Triggers::VERSION}"
+    puts "#{PlaceOS::Triggers::APP_NAME} v#{PlaceOS::Triggers::VERSION}"
     exit 0
   end
 
@@ -49,7 +46,7 @@ OptionParser.parse(ARGV.dup) do |parser|
 end
 
 # Load the routes
-puts "Launching #{ACAEngine::Triggers::APP_NAME} v#{ACAEngine::Triggers::VERSION}"
+puts "Launching #{PlaceOS::Triggers::APP_NAME} v#{PlaceOS::Triggers::VERSION}"
 
 # Requiring config here ensures that the option parser runs before
 # we attempt to connect to databases etc.
@@ -89,4 +86,4 @@ server.run do
 end
 
 # Shutdown message
-puts "#{ACAEngine::Triggers::APP_NAME} leaps through the veldt\n"
+puts "#{PlaceOS::Triggers::APP_NAME} leaps through the veldt\n"

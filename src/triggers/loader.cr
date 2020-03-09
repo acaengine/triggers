@@ -1,9 +1,9 @@
-require "engine-models"
+require "models"
 require "rethinkdb-orm"
 
 require "./state"
 
-module ACAEngine::Triggers
+module PlaceOS::Triggers
   class Loader
     @trigger_cache = {} of String => Model::Trigger
     @trigger_map = {} of String => Array(State)

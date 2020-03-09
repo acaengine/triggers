@@ -1,4 +1,4 @@
-module ACAEngine::Triggers::Api
+module PlaceOS::Triggers::Api
   class Webhook < Application
     base "/api/triggers/v2/webhook"
 

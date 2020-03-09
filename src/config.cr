@@ -10,15 +10,15 @@ logger = ActionController::Base.settings.logger
 logger.level = PROD ? Logger::INFO : Logger::DEBUG
 
 # Required to convince Crystal this file is not a module
-abstract class ACAEngine::Driver; end
+abstract class PlaceOS::Driver; end
 
-class ACAEngine::Driver::Protocol; end
+class PlaceOS::Driver::Protocol; end
 
 # Application code
 require "./constants"
 require "./controllers/application"
 require "./controllers/*"
-require "./engine-triggers/*"
+require "./triggers"
 
 # Server required after application controllers
 require "action-controller/server"
@@ -45,7 +45,7 @@ smtp_tls = (ENV["SMTP_SECURE"]? || "false") == "true"
 
 SMTP_CONFIG.logger = logger
 SMTP_CONFIG.use_auth(user_name, user_pass) unless user_pass.empty?
-#SMTP_CONFIG.use_tls = smtp_tls
+# SMTP_CONFIG.use_tls = smtp_tls
 
-LOADER = ACAEngine::Triggers::Loader.new
+LOADER = PlaceOS::Triggers::Loader.new
 LOADER.load!

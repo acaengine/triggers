@@ -1,13 +1,13 @@
-require "engine-models"
+require "models"
 require "hound-dog"
 require "tasker"
 
 require "json"
 require "redis"
-require "engine-driver/storage"
-require "engine-driver/subscriptions"
-require "engine-driver/proxy/subscriptions"
-require "engine-driver/proxy/remote_driver"
+require "driver/storage"
+require "driver/subscriptions"
+require "driver/proxy/subscriptions"
+require "driver/proxy/remote_driver"
 
 # NOTE:: webhooks should allow drivers to process and provide responses
 # JohnsonControls => posts xml, expects a 200 response (no security)
@@ -16,15 +16,15 @@ require "engine-driver/proxy/remote_driver"
 # => post json, return 200
 # CogniPoint => post json, return 200 (header token)
 
-module ACAEngine::Triggers
+module PlaceOS::Triggers
   class State
-    @@subscriber = ACAEngine::Driver::Subscriptions.new
+    @@subscriber = PlaceOS::Driver::Subscriptions.new
 
     def initialize(@trigger : Model::Trigger, @instance : Model::TriggerInstance)
       @terminated = false
       @trigger_id = @trigger.id.not_nil!
       @instance_id = @instance.id.not_nil!
-      @subscriptions = ACAEngine::Driver::Proxy::Subscriptions.new(@@subscriber)
+      @subscriptions = PlaceOS::Driver::Proxy::Subscriptions.new(@@subscriber)
 
       @conditions_met = {} of String => Bool
       @condition_timers = [] of Tasker::Task
@@ -34,7 +34,7 @@ module ACAEngine::Triggers
       @schedule = Tasker.instance
 
       @triggered = false
-      @storage = ACAEngine::Driver::Storage.new(@instance_id)
+      @storage = PlaceOS::Driver::Storage.new(@instance_id)
       @storage.clear
       @storage["state"] = %({"triggered":false})
       @conditions_met["triggered"] = false
@@ -74,9 +74,9 @@ module ACAEngine::Triggers
         @conditions_met[condition_key] = false
 
         case time.type
-        when ACAEngine::Model::Trigger::Conditions::TimeDependent::Type::At
+        when PlaceOS::Model::Trigger::Conditions::TimeDependent::Type::At
           time_at(condition_key, time.time.not_nil!)
-        when ACAEngine::Model::Trigger::Conditions::TimeDependent::Type::Cron
+        when PlaceOS::Model::Trigger::Conditions::TimeDependent::Type::Cron
           time_cron(condition_key, time.cron.not_nil!)
         end
       end
@@ -120,18 +120,18 @@ module ACAEngine::Triggers
       actions = @trigger.actions.not_nil!
 
       actions.functions.not_nil!.each_with_index do |action, index|
-        modname, index = ACAEngine::Driver::Proxy::RemoteDriver.get_parts(action.mod.not_nil!)
+        modname, index = PlaceOS::Driver::Proxy::RemoteDriver.get_parts(action.mod.not_nil!)
         method = action.method.not_nil!
         args = action.args.not_nil!
 
         # TODO:: we should use the same caching system that is used by the websocket API
         begin
-          response = ACAEngine::Driver::Proxy::RemoteDriver.new(
+          response = PlaceOS::Driver::Proxy::RemoteDriver.new(
             system_id,
             modname,
             index
           ).exec(
-            ACAEngine::Driver::Proxy::RemoteDriver::Clearance::Admin,
+            PlaceOS::Driver::Proxy::RemoteDriver::Clearance::Admin,
             method,
             named_args: args,
             request_id: "action_#{index}_#{Time.utc.to_unix_ms}"
