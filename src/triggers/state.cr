@@ -78,6 +78,8 @@ module PlaceOS::Triggers
           time_at(condition_key, time.time.not_nil!)
         when PlaceOS::Model::Trigger::Conditions::TimeDependent::Type::Cron
           time_cron(condition_key, time.cron.not_nil!)
+        else
+          raise "invalid type: #{time.type.inspect}"
         end
       end
 

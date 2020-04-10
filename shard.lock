@@ -6,15 +6,15 @@ shards:
 
   action-controller:
     github: spider-gazelle/action-controller
-    version: 2.3.4
+    version: 2.4.0
 
   active-model:
     github: spider-gazelle/active-model
-    commit: cfb070793fd53cc20c799761aa5fe8b195e75739
+    version: 1.8.2
 
   ameba:
     github: crystal-ameba/ameba
-    version: 0.11.0
+    version: 0.12.0
 
   bindata:
     github: spider-gazelle/bindata
@@ -32,9 +32,9 @@ shards:
     github: kostya/cron_parser
     version: 0.3.0
 
-  crystal-rethinkdb:
-    github: aca-labs/crystal-rethinkdb
-    commit: 8155487b5cdbced9fd84cc242d459bcb9cd3b015
+  db:
+    github: crystal-lang/crystal-db
+    version: 0.9.0
 
   debug:
     github: Sija/debug.cr
@@ -46,15 +46,15 @@ shards:
 
   driver:
     github: placeos/driver
-    commit: 25f596a36cf291f489e5df0c3f862a40670a12f8
+    version: 1.2.0
 
   email:
     github: arcage/crystal-email
     version: 0.4.6
 
   etcd:
-    github: aca-labs/crystal-etcd
-    version: 0.3.1
+    github: place-labs/crystal-etcd
+    version: 1.0.0
 
   habitat:
     github: luckyframework/habitat
@@ -62,7 +62,7 @@ shards:
 
   hound-dog:
     github: aca-labs/hound-dog
-    version: 2.0.2
+    version: 2.2.1
 
   ipaddress:
     github: Sija/ipaddress.cr
@@ -78,15 +78,15 @@ shards:
 
   models:
     github: placeos/models
-    commit: 6c068d5466ea1186a7cedb16987c753cb3078851
+    version: 1.0.0
 
   murmur3:
     github: aca-labs/murmur3
     commit: 7cbe25c0ca8d052c9d98c377c824dcb0e038c790
 
   neuroplastic:
-    github: aca-labs/neuroplastic
-    commit: 090e63375a5c12d81fb006e737c28bb3a325f27c
+    github: spider-gazelle/neuroplastic
+    version: 1.4.0
 
   openssl_ext:
     github: stakach/openssl_ext
@@ -110,23 +110,27 @@ shards:
 
   redis:
     github: stefanwille/crystal-redis
-    version: 2.5.3
+    version: 2.6.0
 
   rendezvous-hash:
     github: caspiano/rendezvous-hash
     version: 0.3.1
 
+  rethinkdb:
+    github: place-labs/crystal-rethinkdb
+    version: 1.0.0
+
   rethinkdb-orm:
     github: spider-gazelle/rethinkdb-orm
-    commit: db9633d99c3b51d656f94859eabfec7633b35723
+    version: 2.8.0
 
-  retriable:
-    github: sija/retriable.cr
-    version: 0.2.0
+  simple_retry:
+    github: spider-gazelle/simple_retry
+    version: 1.1.0
 
   ssh2:
     github: spider-gazelle/ssh2.cr
-    version: 1.2.4
+    version: 1.2.6
 
   tasker:
     github: spider-gazelle/tasker
@@ -137,6 +141,6 @@ shards:
     version: 1.1.0
 
   ulid:
-    github: aca-labs/ulid
+    github: place-labs/ulid
     version: 0.1.2
 

@@ -14,12 +14,12 @@ dependencies:
   # Driver State
   driver:
     github: placeos/driver
-    branch: master
+    version: ~> 1.2
 
   # Models
   models:
     github: placeos/models
-    branch: master
+    version: ~> 1.0
 
   # timers / scheduling
   tasker:
@@ -29,7 +29,7 @@ dependencies:
   # Service discovery
   hound-dog:
     github: aca-labs/hound-dog
-    branch: master
+    version: ~> 2.2
 
   email:
     github: arcage/crystal-email
