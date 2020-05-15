@@ -6,7 +6,7 @@ shards:
 
   action-controller:
     github: spider-gazelle/action-controller
-    version: 2.4.0
+    version: 3.1.0
 
   active-model:
     github: spider-gazelle/active-model
@@ -14,11 +14,11 @@ shards:
 
   ameba:
     github: crystal-ameba/ameba
-    version: 0.12.0
+    version: 0.12.1
 
   bindata:
     github: spider-gazelle/bindata
-    version: 1.2.0
+    version: 1.5.1
 
   bisect:
     github: spider-gazelle/bisect
@@ -46,23 +46,27 @@ shards:
 
   driver:
     github: placeos/driver
-    version: 1.2.0
+    version: 2.0.5
 
   email:
     github: arcage/crystal-email
-    version: 0.4.6
+    version: 0.6.1
 
   etcd:
     github: place-labs/crystal-etcd
-    version: 1.0.0
+    version: 1.0.1
+
+  future:
+    github: crystal-community/future.cr
+    version: 0.1.0
 
   habitat:
     github: luckyframework/habitat
     version: 0.4.3
 
   hound-dog:
-    github: aca-labs/hound-dog
-    version: 2.2.1
+    github: place-labs/hound-dog
+    version: 2.3.2
 
   ipaddress:
     github: Sija/ipaddress.cr
@@ -72,13 +76,13 @@ shards:
     github: crystal-community/jwt
     version: 1.4.0
 
-  kilt:
-    github: jeromegn/kilt
-    version: 0.6.0
+  log_helper:
+    github: spider-gazelle/log_helper
+    version: 0.1.2
 
   models:
     github: placeos/models
-    version: 1.0.0
+    version: 1.0.9
 
   murmur3:
     github: aca-labs/murmur3
@@ -86,7 +90,7 @@ shards:
 
   neuroplastic:
     github: spider-gazelle/neuroplastic
-    version: 1.4.0
+    version: 1.4.1
 
   openssl_ext:
     github: stakach/openssl_ext
@@ -122,7 +126,7 @@ shards:
 
   rethinkdb-orm:
     github: spider-gazelle/rethinkdb-orm
-    version: 2.8.0
+    version: 2.8.2
 
   simple_retry:
     github: spider-gazelle/simple_retry
@@ -134,7 +138,7 @@ shards:
 
   tasker:
     github: spider-gazelle/tasker
-    version: 1.2.2
+    version: 1.3.0
 
   tokenizer:
     github: spider-gazelle/tokenizer

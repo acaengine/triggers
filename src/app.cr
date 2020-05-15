@@ -1,14 +1,15 @@
 require "option_parser"
 require "http/client"
+require "./constants"
 
 # Server defaults
-port = (ENV["SG_SERVER_PORT"]? || 3000).to_i
-host = ENV["SG_SERVER_HOST"]? || "127.0.0.1"
-process_count = (ENV["SG_PROCESS_COUNT"]? || 1).to_i
+port = App::DEFAULT_PORT
+host = App::DEFAULT_HOST
+process_count = App::DEFAULT_PROCESS_COUNT
 
 # Command line options
 OptionParser.parse(ARGV.dup) do |parser|
-  parser.banner = "Usage: #{PlaceOS::Triggers::APP_NAME} [arguments]"
+  parser.banner = "Usage: #{App::NAME} [arguments]"
 
   parser.on("-b HOST", "--bind=HOST", "Specifies the server host") { |h| host = h }
   parser.on("-p PORT", "--port=PORT", "Specifies the server port") { |p| port = p.to_i }
@@ -23,7 +24,7 @@ OptionParser.parse(ARGV.dup) do |parser|
   end
 
   parser.on("-v", "--version", "Display the application version") do
-    puts "#{PlaceOS::Triggers::APP_NAME} v#{PlaceOS::Triggers::VERSION}"
+    puts "#{App::NAME} v#{App::VERSION}"
     exit 0
   end
 
@@ -46,7 +47,7 @@ OptionParser.parse(ARGV.dup) do |parser|
 end
 
 # Load the routes
-puts "Launching #{PlaceOS::Triggers::APP_NAME} v#{PlaceOS::Triggers::VERSION}"
+puts "Launching #{App::NAME} v#{App::VERSION}"
 
 # Requiring config here ensures that the option parser runs before
 # we attempt to connect to databases etc.
@@ -69,9 +70,10 @@ Signal::TERM.trap &terminate
 
 # Allow signals to change the log level at run-time
 logging = Proc(Signal, Nil).new do |signal|
-  level = signal.usr1? ? Logger::DEBUG : Logger::INFO
+  level = signal.usr1? ? Log::Severity::Debug : Log::Severity::Info
   puts " > Log level changed to #{level}"
-  ActionController::Base.settings.logger.level = level
+  Log.builder.bind "#{App::NAME}.*", level, App::LOG_BACKEND
+  EMail::Client.log_level = level
   signal.ignore
 end
 
@@ -86,4 +88,4 @@ server.run do
 end
 
 # Shutdown message
-puts "#{PlaceOS::Triggers::APP_NAME} leaps through the veldt\n"
+puts "#{App::NAME} leaps through the veldt\n"

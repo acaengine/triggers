@@ -96,14 +96,14 @@ class PlaceOS::Triggers::State::Comparison
 
         # Grab the deeper key if specified
         final_index = @status.keys.size - 1
-        @status.keys.each_with_index do |key, index|
+        @status.keys.each_with_index do |key, inner_index|
           next_val = val[key]?
           if next_val
-            case temp = next_val.raw
+            case next_val.raw
             when Hash
               val = next_val
             else
-              if final_index == index
+              if final_index == inner_index
                 val = next_val
               else
                 # There are more keys and we don't have a hash to go deeper

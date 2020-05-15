@@ -5,6 +5,8 @@ require "./state"
 
 module PlaceOS::Triggers
   class Loader
+    Log = ::App::Log.for("loader")
+
     @trigger_cache = {} of String => Model::Trigger
     @trigger_map = {} of String => Array(State)
     @instances = {} of String => State
@@ -12,10 +14,17 @@ module PlaceOS::Triggers
     getter instances
 
     def load!
+      # This ensures the change feeds are live before we load the trigger instances
       spawn(same_thread: true) { watch_triggers! }
       spawn(same_thread: true) { watch_instances! }
       spawn(same_thread: true) do
-        Model::TriggerInstance.all.each &->new_instance(Model::TriggerInstance)
+        begin
+          Model::TriggerInstance.all.each &->new_instance(Model::TriggerInstance)
+        rescue error
+          Log.fatal(exception: error) { "failed to load trigger instances\n#{error.inspect_with_backtrace}" }
+          sleep 0.2
+          exit 3
+        end
       end
       Fiber.yield
     end
@@ -48,6 +57,10 @@ module PlaceOS::Triggers
           end
         end
       end
+    rescue error
+      Log.fatal(exception: error) { "trigger change feed failed\n#{error.inspect_with_backtrace}" }
+      sleep 0.2
+      exit 1
     end
 
     private def watch_instances!
@@ -64,6 +77,10 @@ module PlaceOS::Triggers
           new_instance(instance)
         end
       end
+    rescue error
+      Log.fatal(exception: error) { "trigger instance change feed failed\n#{error.inspect_with_backtrace}" }
+      sleep 0.2
+      exit 2
     end
 
     def new_instance(instance)

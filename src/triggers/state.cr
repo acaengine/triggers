@@ -121,14 +121,15 @@ module PlaceOS::Triggers
       system_id = @instance.control_system_id.not_nil!
       actions = @trigger.actions.not_nil!
 
-      actions.functions.not_nil!.each_with_index do |action, index|
+      actions.functions.not_nil!.each_with_index do |action, function_index|
         modname, index = PlaceOS::Driver::Proxy::RemoteDriver.get_parts(action.mod.not_nil!)
         method = action.method.not_nil!
         args = action.args.not_nil!
 
         # TODO:: we should use the same caching system that is used by the websocket API
         begin
-          response = PlaceOS::Driver::Proxy::RemoteDriver.new(
+          # NOTE:: do we want to process the response here?
+          PlaceOS::Driver::Proxy::RemoteDriver.new(
             system_id,
             modname,
             index
@@ -136,7 +137,7 @@ module PlaceOS::Triggers
             PlaceOS::Driver::Proxy::RemoteDriver::Clearance::Admin,
             method,
             named_args: args,
-            request_id: "action_#{index}_#{Time.utc.to_unix_ms}"
+            request_id: "action_#{function_index}_#{Time.utc.to_unix_ms}"
           )
         rescue error
           # TODO:: log the errors
