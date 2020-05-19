@@ -1,6 +1,8 @@
 require "./state"
 
 class PlaceOS::Triggers::State::Comparison
+  Log = ::App::Log.for("comparison")
+
   def initialize(
     @state : State,
     @condition_key : String,
@@ -32,7 +34,7 @@ class PlaceOS::Triggers::State::Comparison
   property compare : String
   property right : Constant
 
-  def bind!(subscriptions)
+  def bind!(subscriptions) : Nil
     left.bind!(self, subscriptions, @system_id)
     right.bind!(self, subscriptions, @system_id)
     nil
@@ -41,28 +43,38 @@ class PlaceOS::Triggers::State::Comparison
   def compare!
     left_val = @left.value
     right_val = @right.value
+
     result = case compare
              when "equal"
                left_val == right_val
              when "not_equal"
                left_val != right_val
              when "greater_than"
-               left_val > right_val
+               left_val.as(Float64 | Int64) > right_val.as(Float64 | Int64)
              when "greater_than_or_equal"
-               left_val >= right_val
+               left_val.as(Float64 | Int64) >= right_val.as(Float64 | Int64)
              when "less_than"
-               left_val < right_val
+               left_val.as(Float64 | Int64) < right_val.as(Float64 | Int64)
              when "less_than_or_equal"
-               left_val <= right_val
+               left_val.as(Float64 | Int64) <= right_val.as(Float64 | Int64)
              when "and"
-               left_val && right_val
+               left_val != false && right_val != false && !left_val.nil? && !right_val.nil?
              when "or"
-               !!(left_val || right_val)
+               (left_val != false && !left_val.nil?) || (right_val != false && !right_val.nil?)
              when "exclusive_or"
-               (!!(left_val || right_val)) && !(left_val && right_val)
+               if left_val != false && right_val != false && !left_val.nil? && !right_val.nil?
+                 false
+               else
+                 (left_val != false && !left_val.nil?) || (right_val != false && !right_val.nil?)
+               end
              else
                false
              end
+
+    Log.debug { {
+      message:   "comparing #{left_val.inspect} #{compare} #{right_val.inspect} == #{result}",
+      system_id: @system_id,
+    } }
 
     @state.set_condition @condition_key, result
   end
@@ -75,8 +87,7 @@ class PlaceOS::Triggers::State::Comparison
 
     getter value
 
-    def bind!(comparison, subscriptions, system_id)
-      nil
+    def bind!(comparison, subscriptions, system_id) : Nil
     end
   end
 
@@ -90,13 +101,32 @@ class PlaceOS::Triggers::State::Comparison
     @value : JSON::Any::Type
 
     def bind!(comparison, subscriptions, system_id)
-      module_name, index = PlaceOS::Driver::Proxy::RemoteDriver.get_parts(@status.mod)
-      subscriptions.subscribe(system_id, module_name, index, @status.status) do |_, data|
+      module_name, index = PlaceOS::Driver::Proxy::RemoteDriver.get_parts(@status[:mod])
+
+      Log.debug { {
+        system_id: system_id,
+        module:    module_name,
+        index:     index,
+        status:    @status[:status],
+        message:   "susbscribed to '#{@status[:status]}'",
+      } }
+
+      subscriptions.subscribe(system_id, module_name, index, @status[:status]) do |_, data|
         val = JSON.parse(data)
 
+        Log.debug { {
+          system_id: system_id,
+          module:    module_name,
+          index:     index,
+          status:    @status[:status],
+          message:   "received value for comparison: #{data}",
+        } }
+
         # Grab the deeper key if specified
-        final_index = @status.keys.size - 1
-        @status.keys.each_with_index do |key, inner_index|
+        final_index = @status[:keys].size - 1
+        @status[:keys].each_with_index do |key, inner_index|
+          break if val.raw.nil?
+
           next_val = val[key]?
           if next_val
             case next_val.raw
@@ -116,6 +146,14 @@ class PlaceOS::Triggers::State::Comparison
             break
           end
         end
+
+        Log.debug { {
+          system_id: system_id,
+          module:    module_name,
+          index:     index,
+          status:    @status[:status],
+          message:   "dug for #{@status[:keys]} - got #{val.inspect}",
+        } }
 
         # Update the value and re-compare
         if val

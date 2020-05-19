@@ -33,6 +33,8 @@ module PlaceOS::Triggers
       Model::Trigger.changes.each do |change|
         trigger = change[:value]
 
+        Log.debug { {trigger: trigger.id, message: "trigger '#{trigger.name}' #{change[:event]}"} }
+
         case change[:event]
         when RethinkORM::Changefeed::Event::Deleted
           @trigger_cache.delete trigger.id
@@ -66,6 +68,8 @@ module PlaceOS::Triggers
     private def watch_instances!
       Model::TriggerInstance.changes.each do |change|
         instance = change[:value]
+
+        Log.debug { {trigger: instance.trigger_id, instance: instance.id, system_id: instance.control_system_id, message: "trigger instance #{change[:event]}"} }
 
         case change[:event]
         when RethinkORM::Changefeed::Event::Deleted

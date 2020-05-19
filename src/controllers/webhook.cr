@@ -24,12 +24,24 @@ module PlaceOS::Triggers::Api
     # Return 204 if the state isn't loaded, might still be loading?
     # 202 on success
     def create
-      trigger_id = @trigger.not_nil!.id
+      trig = @trigger.not_nil!
+      trigger_id = trig.id
       if state = LOADER.instances[trigger_id]?
+        Log.debug { {
+          message:   "setting webhook condition for '#{state.trigger.name}'",
+          instance:  trigger_id,
+          trigger:   trig.trigger_id,
+          system_id: trig.control_system_id,
+        } }
         state.temporary_condition_met("webhook")
         head :accepted
       else
-        Log.warn { {message: "trigger state not loaded for #{trigger_id}", trigger_id: trigger_id} }
+        Log.warn { {
+          message:   "trigger state not loaded",
+          instance:  trigger_id,
+          trigger:   trig.trigger_id,
+          system_id: trig.control_system_id,
+        } }
         head :no_content
       end
     end
@@ -44,11 +56,21 @@ module PlaceOS::Triggers::Api
         if trig.webhook_secret == args.secret
           @trigger = trig
         else
-          Log.warn { {message: "incorrect secret for trigger #{args.id}", trigger_id: args.id} }
+          Log.warn { {
+            message:   "incorrect secret for trigger instance #{args.id}",
+            instance:  args.id,
+            trigger:   trig.trigger_id,
+            system_id: trig.control_system_id,
+          } }
           head :not_found
         end
       else
-        Log.warn { {message: "disabled trigger called #{args.id}", trigger_id: args.id} }
+        Log.warn { {
+          message:   "webhook for disabled trigger instance #{args.id}",
+          instance:  args.id,
+          trigger:   trig.trigger_id,
+          system_id: trig.control_system_id,
+        } }
         head :not_found
       end
     end

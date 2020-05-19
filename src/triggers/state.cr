@@ -18,6 +18,8 @@ require "driver/proxy/remote_driver"
 
 module PlaceOS::Triggers
   class State
+    Log = ::App::Log.for("state")
+
     @@subscriber = PlaceOS::Driver::Subscriptions.new
 
     def initialize(@trigger : Model::Trigger, @instance : Model::TriggerInstance)
@@ -48,6 +50,7 @@ module PlaceOS::Triggers
     getter instance_id : String
     getter trigger : Model::Trigger
     getter instance : Model::TriggerInstance
+    getter triggered : Bool
 
     def terminate!
       @terminated = true
@@ -87,15 +90,27 @@ module PlaceOS::Triggers
       system_id = @instance.control_system_id.not_nil!
       comparisons = conditions.comparisons.not_nil!
       comparisons.each_with_index do |comparison, index|
+        condition_key = "comparison_#{index}"
+        @conditions_met[condition_key] = false
+
         @comparisons << Comparison.new(
           self,
-          "comparison_#{index}",
+          condition_key,
           system_id,
           comparison.left.not_nil!,
           comparison.operator.not_nil!,
           comparison.right.not_nil!
         )
       end
+
+      @comparisons.each(&.bind!(@subscriptions))
+    rescue error
+      Log.error(exception: error) { {
+        system_id: @instance.control_system_id,
+        trigger:   @instance.trigger_id,
+        instance:  @instance.id,
+        message:   "failed to initialize trigger instance '#{@trigger.name}'\n#{error.inspect_with_backtrace}",
+      } }
     end
 
     def set_condition(key : String, state : Bool)
@@ -104,7 +119,15 @@ module PlaceOS::Triggers
     end
 
     def check_trigger!
-      update_state !@conditions_met.values.includes?(false)
+      state = true
+      @conditions_met.each do |key, value|
+        next if key == "triggered"
+        if value == false
+          state = value
+          break
+        end
+      end
+      update_state state
     end
 
     def update_state(triggered : Bool)
@@ -113,6 +136,13 @@ module PlaceOS::Triggers
       @triggered = triggered
       @conditions_met["triggered"] = triggered
       @storage["state"] = @conditions_met.to_json
+
+      Log.info { {
+        system_id: @instance.control_system_id,
+        trigger:   @instance.trigger_id,
+        instance:  @instance.id,
+        message:   "state changed to #{triggered}",
+      } }
 
       # Check if we should run the actions
       return unless triggered
@@ -125,10 +155,22 @@ module PlaceOS::Triggers
         modname, index = PlaceOS::Driver::Proxy::RemoteDriver.get_parts(action.mod.not_nil!)
         method = action.method.not_nil!
         args = action.args.not_nil!
+        request_id = "action_#{function_index}_#{Time.utc.to_unix_ms}"
+
+        Log.debug { {
+          system_id:  system_id,
+          module:     modname,
+          index:      index,
+          method:     method,
+          request_id: request_id,
+          trigger:    @instance.trigger_id,
+          instance:   @instance.id,
+          message:    "performing exec for trigger '#{@trigger.name}'",
+        } }
 
         # TODO:: we should use the same caching system that is used by the websocket API
         begin
-          # NOTE:: do we want to process the response here?
+          # TODO:: do we want to process the response here?
           PlaceOS::Driver::Proxy::RemoteDriver.new(
             system_id,
             modname,
@@ -137,15 +179,31 @@ module PlaceOS::Triggers
             PlaceOS::Driver::Proxy::RemoteDriver::Clearance::Admin,
             method,
             named_args: args,
-            request_id: "action_#{function_index}_#{Time.utc.to_unix_ms}"
+            request_id: request_id
           )
         rescue error
-          # TODO:: log the errors
+          Log.error(exception: error) { {
+            system_id:  system_id,
+            module:     modname,
+            index:      index,
+            method:     method,
+            request_id: request_id,
+            trigger:    @instance.trigger_id,
+            instance:   @instance.id,
+            message:    "exec failed for trigger '#{@trigger.name}'\n#{error.inspect_with_backtrace}",
+          } }
         end
       end
 
       mailers = actions.mailers.not_nil!
       if !mailers.empty?
+        Log.debug { {
+          system_id: @instance.control_system_id,
+          trigger:   @instance.trigger_id,
+          instance:  @instance.id,
+          message:   "sending email for trigger '#{@trigger.name}'",
+        } }
+
         begin
           # Create SMTP client object
           client = EMail::Client.new(::SMTP_CONFIG)
@@ -164,9 +222,13 @@ module PlaceOS::Triggers
               end
             end
           end
-        rescue e
-          # TODO:: log the error
-          # Potentially this should be done in sidekiq or similar?
+        rescue error
+          Log.error(exception: error) { {
+            system_id: @instance.control_system_id,
+            trigger:   @instance.trigger_id,
+            instance:  @instance.id,
+            message:   "email send failed for trigger '#{@trigger.name}'\n#{error.inspect_with_backtrace}",
+          } }
         end
       end
     end

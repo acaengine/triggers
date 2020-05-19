@@ -1,6 +1,6 @@
 # PlaceOS Triggers
 
-[![Build Status](https://travis-ci.org/placeos/triggers.svg?branch=master)](https://travis-ci.org/placeos/triggers)
+[![Build Status](https://api.travis-ci.com/PlaceOS/triggers.svg?branch=master)](https://travis-ci.com/placeos/triggers)
 
 PlaceOS service handling events and conditional triggers.
 
