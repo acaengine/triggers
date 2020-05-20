@@ -77,6 +77,13 @@ class PlaceOS::Triggers::State::Comparison
     } }
 
     @state.set_condition @condition_key, result
+  rescue error
+    @state.set_condition @condition_key, false
+    @state.increment_comparison_error
+    Log.warn(exception: error) { {
+      message:   "comparing #{@left.value.inspect} #{@compare} #{@right.value.inspect}",
+      system_id: @system_id,
+    } }
   end
 
   class Constant

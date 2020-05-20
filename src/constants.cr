@@ -17,6 +17,13 @@ module App
   SMTP_PASS   = ENV["SMTP_PASS"]? || ""
   SMTP_SECURE = ENV["SMTP_SECURE"]? || ""
 
+  CORE_NAMESPACE = "core"
+  CORE_DISCOVERY = HoundDog::Discovery.new(CORE_NAMESPACE)
+
+  def self.discovery
+    CORE_DISCOVERY
+  end
+
   def self.smtp_authenticated?
     !SMTP_USER.empty?
   end

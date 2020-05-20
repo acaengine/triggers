@@ -14,7 +14,7 @@ abstract class Application < ActionController::Base
 
   # 404 if resource not present
   rescue_from RethinkORM::Error::DocumentNotFound do |error|
-    Log.debug(exception: error) { error.inspect_with_backtrace }
+    Log.debug(exception: error) { error.message }
     head :not_found
   end
 end

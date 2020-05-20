@@ -29,6 +29,8 @@ module PlaceOS::Triggers
       @subscriptions = PlaceOS::Driver::Proxy::Subscriptions.new(@@subscriber)
 
       @conditions_met = {} of String => Bool
+      @conditions_met["webhook"] = false if @trigger.enable_webhook
+
       @condition_timers = [] of Tasker::Task
       @debounce_timers = {} of String => Tasker::Task
       @comparisons = [] of Comparison
@@ -36,11 +38,12 @@ module PlaceOS::Triggers
       @schedule = Tasker.instance
 
       @triggered = false
+      @count = 0_i64
+      @comparison_errors = 0_i64
+      @action_errors = 0_i64
       @storage = PlaceOS::Driver::Storage.new(@instance_id)
       @storage.clear
-      @storage["state"] = %({"triggered":false})
-      @conditions_met["triggered"] = false
-      @conditions_met["webhook"] = false if @trigger.enable_webhook
+      publish_state
 
       # New thread!
       spawn { monitor! }
@@ -51,6 +54,7 @@ module PlaceOS::Triggers
     getter trigger : Model::Trigger
     getter instance : Model::TriggerInstance
     getter triggered : Bool
+    getter count : Int64
 
     def terminate!
       @terminated = true
@@ -109,7 +113,7 @@ module PlaceOS::Triggers
         system_id: @instance.control_system_id,
         trigger:   @instance.trigger_id,
         instance:  @instance.id,
-        message:   "failed to initialize trigger instance '#{@trigger.name}'\n#{error.inspect_with_backtrace}",
+        message:   "failed to initialize trigger instance '#{@trigger.name}'",
       } }
     end
 
@@ -119,23 +123,50 @@ module PlaceOS::Triggers
     end
 
     def check_trigger!
-      state = true
-      @conditions_met.each do |key, value|
-        next if key == "triggered"
-        if value == false
-          state = value
-          break
-        end
+      update_state !@conditions_met.values.includes?(false)
+    end
+
+    def increment_action_error
+      begin
+        @action_errors += 1
+      rescue OverflowError
+        @action_errors = 1
       end
-      update_state state
+      publish_state
+    end
+
+    def increment_comparison_error
+      begin
+        @comparison_errors += 1
+      rescue OverflowError
+        @comparison_errors = 1
+      end
+      publish_state
+    end
+
+    def publish_state
+      @storage["state"] = {
+        triggered:         @triggered,
+        trigger_count:     @count,
+        action_errors:     @action_errors,
+        comparison_errors: @comparison_errors,
+        conditions:        @conditions_met,
+      }.to_json
     end
 
     def update_state(triggered : Bool)
       # Check if there was change
       return if triggered == @triggered
+      if triggered
+        begin
+          @count += 1
+        rescue OverflowError
+          @count = 0_i64
+        end
+      end
+
       @triggered = triggered
-      @conditions_met["triggered"] = triggered
-      @storage["state"] = @conditions_met.to_json
+      publish_state
 
       Log.info { {
         system_id: @instance.control_system_id,
@@ -168,13 +199,12 @@ module PlaceOS::Triggers
           message:    "performing exec for trigger '#{@trigger.name}'",
         } }
 
-        # TODO:: we should use the same caching system that is used by the websocket API
         begin
-          # TODO:: do we want to process the response here?
           PlaceOS::Driver::Proxy::RemoteDriver.new(
             system_id,
             modname,
-            index
+            index,
+            App.discovery
           ).exec(
             PlaceOS::Driver::Proxy::RemoteDriver::Clearance::Admin,
             method,
@@ -190,8 +220,9 @@ module PlaceOS::Triggers
             request_id: request_id,
             trigger:    @instance.trigger_id,
             instance:   @instance.id,
-            message:    "exec failed for trigger '#{@trigger.name}'\n#{error.inspect_with_backtrace}",
+            message:    "exec failed for trigger '#{@trigger.name}'",
           } }
+          increment_action_error
         end
       end
 
@@ -227,8 +258,9 @@ module PlaceOS::Triggers
             system_id: @instance.control_system_id,
             trigger:   @instance.trigger_id,
             instance:  @instance.id,
-            message:   "email send failed for trigger '#{@trigger.name}'\n#{error.inspect_with_backtrace}",
+            message:   "email send failed for trigger '#{@trigger.name}'",
           } }
+          increment_action_error
         end
       end
     end

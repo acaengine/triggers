@@ -21,7 +21,7 @@ module PlaceOS::Triggers
         begin
           Model::TriggerInstance.all.each &->new_instance(Model::TriggerInstance)
         rescue error
-          Log.fatal(exception: error) { "failed to load trigger instances\n#{error.inspect_with_backtrace}" }
+          Log.fatal(exception: error) { "failed to load trigger instances" }
           sleep 0.2
           exit 3
         end
@@ -60,7 +60,7 @@ module PlaceOS::Triggers
         end
       end
     rescue error
-      Log.fatal(exception: error) { "trigger change feed failed\n#{error.inspect_with_backtrace}" }
+      Log.fatal(exception: error) { "trigger change feed failed" }
       sleep 0.2
       exit 1
     end
@@ -82,7 +82,7 @@ module PlaceOS::Triggers
         end
       end
     rescue error
-      Log.fatal(exception: error) { "trigger instance change feed failed\n#{error.inspect_with_backtrace}" }
+      Log.fatal(exception: error) { "trigger instance change feed failed" }
       sleep 0.2
       exit 2
     end
