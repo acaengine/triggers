@@ -1,5 +1,5 @@
 require "random"
-require "models"
+require "placeos-models"
 
 RANDOM = Random.new
 

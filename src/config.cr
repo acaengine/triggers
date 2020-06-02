@@ -13,7 +13,7 @@ class PlaceOS::Driver::Protocol; end
 require "./constants"
 require "./controllers/application"
 require "./controllers/*"
-require "./triggers"
+require "./placeos-triggers"
 
 # Server required after application controllers
 require "action-controller/server"

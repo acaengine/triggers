@@ -1,4 +1,4 @@
-require "models"
+require "placeos-models"
 require "rethinkdb-orm"
 
 require "./state"

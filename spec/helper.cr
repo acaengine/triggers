@@ -22,7 +22,7 @@ WebMock.stub(:post, "http://127.0.0.1:2379/v3beta/watch")
 
 # Triggers code
 require "../src/config"
-require "../src/triggers"
+require "../src/placeos-triggers"
 
 # Generators for Engine models
 require "./generator"

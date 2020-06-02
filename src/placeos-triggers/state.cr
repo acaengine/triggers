@@ -1,5 +1,5 @@
-require "models"
 require "hound-dog"
+require "placeos-models"
 require "tasker"
 
 require "json"
