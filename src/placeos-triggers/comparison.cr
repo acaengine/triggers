@@ -40,6 +40,7 @@ class PlaceOS::Triggers::State::Comparison
     nil
   end
 
+  # ameba:disable Metrics/CyclomaticComplexity
   def compare!
     left_val = @left.value
     right_val = @right.value
