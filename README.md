@@ -13,6 +13,7 @@ PlaceOS service handling events and conditional triggers.
 * `SMTP_USER` = username if any required, will not authenticate if this is left blank
 * `SMTP_PASS` = password if required
 * `SMTP_SECURE` = left blank for clear text, `SMTPS` for a TLS connection, `STARTTLS` for negotiating TLS on an initial clear text connection
+* `REDIS_URL` = the redis connection string, defaults to `redis://localhost:6379`
 
 ## Testing
 

@@ -3,7 +3,6 @@ require "placeos-models"
 require "tasker"
 
 require "json"
-require "redis"
 require "driver/storage"
 require "driver/subscriptions"
 require "driver/proxy/subscriptions"

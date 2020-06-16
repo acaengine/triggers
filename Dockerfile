@@ -1,6 +1,9 @@
-FROM crystallang/crystal:0.34.0-alpine
+FROM crystallang/crystal:0.35.0-alpine
 
 WORKDIR /app
+
+# Add trusted CAs for communicating with external services
+RUN apk update && apk add --no-cache ca-certificates tzdata && update-ca-certificates
 
 # Install shards for caching
 COPY shard.yml shard.yml
@@ -42,9 +45,8 @@ COPY --from=0 /app/triggers /triggers
 COPY --from=0 /etc/hosts /etc/hosts
 
 # These provide certificate chain validation where communicating with external services over TLS
-COPY --from=0 /etc/ca-certificates* /etc/
-COPY --from=0 /etc/ssl/ /etc/ssl/
-COPY --from=0 /usr/share/ca-certificates/ /usr/share/ca-certificates/
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 # This is required for Timezone support
 COPY --from=0 /usr/share/zoneinfo/ /usr/share/zoneinfo/
