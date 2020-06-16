@@ -3,10 +3,10 @@ require "placeos-models"
 require "tasker"
 
 require "json"
-require "driver/storage"
-require "driver/subscriptions"
-require "driver/proxy/subscriptions"
-require "driver/proxy/remote_driver"
+require "placeos-driver/storage"
+require "placeos-driver/subscriptions"
+require "placeos-driver/proxy/subscriptions"
+require "placeos-driver/proxy/remote_driver"
 
 # NOTE:: webhooks should allow drivers to process and provide responses
 # JohnsonControls => posts xml, expects a 200 response (no security)
