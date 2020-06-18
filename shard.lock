@@ -6,7 +6,7 @@ shards:
 
   action-controller:
     git: https://github.com/spider-gazelle/action-controller.git
-    version: 3.1.5
+    version: 3.1.6
 
   active-model:
     git: https://github.com/spider-gazelle/active-model.git
@@ -90,7 +90,7 @@ shards:
 
   neuroplastic:
     git: https://github.com/spider-gazelle/neuroplastic.git
-    version: 1.4.1
+    version: 1.4.2
 
   openssl_ext:
     git: https://github.com/stakach/openssl_ext.git
@@ -98,7 +98,7 @@ shards:
 
   placeos-driver:
     git: https://github.com/placeos/driver.git
-    version: 3.3.2
+    version: 3.3.3
 
   placeos-models:
     git: https://github.com/placeos/models.git
