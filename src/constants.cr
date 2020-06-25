@@ -1,3 +1,5 @@
+require "secrets-env"
+
 module App
   NAME    = "triggers"
   VERSION = {{ `shards version "#{__DIR__}"`.chomp.stringify.downcase }}
