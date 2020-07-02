@@ -105,6 +105,6 @@ module PlaceOS::Model
         status["action_errors"].as_i.should eq(0)
         status["comparison_errors"].as_i.should eq(0)
       end # with_redis
-    end # it
-  end # describe
-end # module
+    end   # it
+  end     # describe
+end       # module
