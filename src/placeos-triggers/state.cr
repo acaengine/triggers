@@ -30,11 +30,12 @@ module PlaceOS::Triggers
       @conditions_met = {} of String => Bool
       @conditions_met["webhook"] = false if @trigger.enable_webhook
 
+      debounce_period = @trigger.debounce_period || 0
+      @debounce_period = debounce_period == 0 ? 59.seconds : debounce_period.milliseconds
+
       @condition_timers = [] of Tasker::Task
       @debounce_timers = {} of String => Tasker::Task
       @comparisons = [] of Comparison
-
-      @schedule = Tasker.instance
 
       @triggered = false
       @count = 0_i64
@@ -47,6 +48,8 @@ module PlaceOS::Triggers
       # New thread!
       spawn { monitor! }
     end
+
+    @debounce_period : Time::Span
 
     getter trigger_id : String
     getter instance_id : String
@@ -265,11 +268,11 @@ module PlaceOS::Triggers
     end
 
     def time_at(key, time)
-      @condition_timers << @schedule.at(time) { temporary_condition_met(key) }
+      @condition_timers << Tasker.at(time) { temporary_condition_met(key) }
     end
 
     def time_cron(key, cron)
-      @condition_timers << @schedule.cron(cron) { temporary_condition_met(key) }
+      @condition_timers << Tasker.cron(cron) { temporary_condition_met(key) }
     end
 
     def temporary_condition_met(key : String)
@@ -278,7 +281,7 @@ module PlaceOS::Triggers
       end
 
       # Revert the status of this condition
-      @debounce_timers[key] = @schedule.in(59.seconds) do
+      @debounce_timers[key] = Tasker.in(@debounce_period) do
         @debounce_timers.delete key
         @conditions_met[key] = false
         update_state(false)
