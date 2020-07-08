@@ -1,5 +1,5 @@
 name: placeos-triggers
-version: 1.1.0
+version: 1.1.1
 
 targets:
   triggers:
@@ -17,7 +17,7 @@ dependencies:
   # Models
   placeos-models:
     github: placeos/models
-    version: ~> 2.0
+    version: ~> 3.1
 
   # Tagged logging
   log_helper:
@@ -26,12 +26,12 @@ dependencies:
   # timers / scheduling
   tasker:
     github: spider-gazelle/tasker
-    version: ~> 1.2
+    version: ~> 2.0
 
   # Service discovery
   hound-dog:
     github: place-labs/hound-dog
-    version: ~> 2.4
+    version: ~> 2.5
 
   email:
     github: arcage/crystal-email
