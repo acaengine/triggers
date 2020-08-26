@@ -6,7 +6,7 @@ shards:
 
   action-controller:
     git: https://github.com/spider-gazelle/action-controller.git
-    version: 3.3.0
+    version: 3.4.0
 
   active-model:
     git: https://github.com/spider-gazelle/active-model.git
@@ -14,11 +14,11 @@ shards:
 
   ameba:
     git: https://github.com/crystal-ameba/ameba.git
-    version: 0.13.0
+    version: 0.13.1
 
   bindata:
     git: https://github.com/spider-gazelle/bindata.git
-    version: 1.5.5
+    version: 1.5.6
 
   bisect:
     git: https://github.com/spider-gazelle/bisect.git
@@ -42,11 +42,11 @@ shards:
 
   debug:
     git: https://github.com/Sija/debug.cr.git
-    version: 1.1.0
+    version: 2.0.0
 
   email:
     git: https://github.com/arcage/crystal-email.git
-    version: 0.6.1
+    version: 0.6.2
 
   etcd:
     git: https://github.com/place-labs/crystal-etcd.git
@@ -62,7 +62,7 @@ shards:
 
   hound-dog:
     git: https://github.com/place-labs/hound-dog.git
-    version: 2.5.0
+    version: 2.5.1
 
   ipaddress:
     git: https://github.com/Sija/ipaddress.cr.git
@@ -90,7 +90,7 @@ shards:
 
   neuroplastic:
     git: https://github.com/spider-gazelle/neuroplastic.git
-    version: 1.6.1
+    version: 1.6.4
 
   openssl_ext:
     git: https://github.com/stakach/openssl_ext.git
@@ -98,11 +98,11 @@ shards:
 
   placeos-driver:
     git: https://github.com/placeos/driver.git
-    version: 3.4.4
+    version: 3.5.8
 
   placeos-models:
     git: https://github.com/placeos/models.git
-    version: 3.1.1
+    version: 3.3.0
 
   pool:
     git: https://github.com/ysbaddaden/pool.git
@@ -134,7 +134,7 @@ shards:
 
   rethinkdb:
     git: https://github.com/kingsleyh/crystal-rethinkdb.git
-    version: 0.2.0
+    version: 0.2.1
 
   rethinkdb-orm:
     git: https://github.com/spider-gazelle/rethinkdb-orm.git
@@ -158,7 +158,7 @@ shards:
 
   tasker:
     git: https://github.com/spider-gazelle/tasker.git
-    version: 2.0.0
+    version: 2.0.1
 
   tokenizer:
     git: https://github.com/spider-gazelle/tokenizer.git
