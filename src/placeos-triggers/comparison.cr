@@ -116,7 +116,7 @@ class PlaceOS::Triggers::State::Comparison
         module:    module_name,
         index:     index,
         status:    @status[:status],
-        message:   "susbscribed to '#{@status[:status]}'",
+        message:   "subscribed to '#{@status[:status]}'",
       } }
 
       subscriptions.subscribe(system_id, module_name, index, @status[:status]) do |_, data|
