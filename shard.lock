@@ -18,7 +18,7 @@ shards:
 
   bindata:
     git: https://github.com/spider-gazelle/bindata.git
-    version: 1.5.6
+    version: 1.7.0
 
   bisect:
     git: https://github.com/spider-gazelle/bisect.git
@@ -38,7 +38,7 @@ shards:
 
   db:
     git: https://github.com/crystal-lang/crystal-db.git
-    version: 0.9.0
+    version: 0.10.0
 
   debug:
     git: https://github.com/Sija/debug.cr.git
@@ -62,7 +62,7 @@ shards:
 
   hound-dog:
     git: https://github.com/place-labs/hound-dog.git
-    version: 2.5.2
+    version: 2.5.3
 
   http-params-serializable:
     git: https://github.com/vladfaust/http-params-serializable.git
@@ -94,7 +94,7 @@ shards:
 
   neuroplastic:
     git: https://github.com/spider-gazelle/neuroplastic.git
-    version: 1.6.4
+    version: 1.7.1
 
   openssl_ext:
     git: https://github.com/stakach/openssl_ext.git
@@ -102,11 +102,11 @@ shards:
 
   placeos-driver:
     git: https://github.com/placeos/driver.git
-    version: 3.5.10
+    version: 3.5.17
 
   placeos-models:
     git: https://github.com/placeos/models.git
-    version: 4.2.5
+    version: 4.5.0
 
   pool:
     git: https://github.com/ysbaddaden/pool.git
@@ -142,7 +142,7 @@ shards:
 
   rethinkdb-orm:
     git: https://github.com/spider-gazelle/rethinkdb-orm.git
-    version: 3.0.2
+    version: 3.1.1
 
   retriable:
     git: https://github.com/Sija/retriable.cr.git
@@ -150,7 +150,7 @@ shards:
 
   secrets-env:
     git: https://github.com/place-labs/secrets-env.git
-    version: 1.0.0
+    version: 1.1.0
 
   simple_retry:
     git: https://github.com/spider-gazelle/simple_retry.git
@@ -162,7 +162,7 @@ shards:
 
   tasker:
     git: https://github.com/spider-gazelle/tasker.git
-    version: 2.0.1
+    version: 2.0.2
 
   tokenizer:
     git: https://github.com/spider-gazelle/tokenizer.git

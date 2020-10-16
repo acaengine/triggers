@@ -1,3 +1,4 @@
+require "secrets-env"
 require "spec"
 require "base64"
 require "random"
