@@ -17,7 +17,6 @@ dependencies:
   # Models
   placeos-models:
     github: placeos/models
-    version: ~> 4
 
   # Tagged logging
   log_helper:
@@ -26,12 +25,10 @@ dependencies:
   # timers / scheduling
   tasker:
     github: spider-gazelle/tasker
-    version: ~> 2.0
 
   # Service discovery
   hound-dog:
     github: place-labs/hound-dog
-    version: ~> 2.5
 
   email:
     github: arcage/crystal-email

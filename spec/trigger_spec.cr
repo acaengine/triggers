@@ -3,7 +3,7 @@ require "./helper"
 module PlaceOS::Model
   describe Trigger do
     Spec.after_suite {
-      store = PlaceOS::Driver::Storage.new("mod-1234")
+      store = PlaceOS::Driver::RedisStorage.new("mod-1234")
       store.clear
     }
 
@@ -29,7 +29,7 @@ module PlaceOS::Model
 
       # create the status lookup structure
       sys_id = inst.control_system_id.not_nil!
-      storage = PlaceOS::Driver::Storage.new(sys_id, "system")
+      storage = PlaceOS::Driver::RedisStorage.new(sys_id, "system")
       storage["Test/1"] = "mod-1234"
 
       PlaceOS::Driver::Subscriptions.new_redis.publish "lookup-change", sys_id
@@ -37,12 +37,12 @@ module PlaceOS::Model
       sleep 0.1
 
       # signal a change in lookup state
-      PlaceOS::Driver::Storage.with_redis do |redis|
+      PlaceOS::Driver::RedisStorage.with_redis do |redis|
         # Ensure the trigger hasn't fired
         state = ::LOADER.instances[inst.id]
         state.triggered.should be_false
 
-        store = PlaceOS::Driver::Storage.new("mod-1234")
+        store = PlaceOS::Driver::RedisStorage.new("mod-1234")
         store[:state] = {on: true}.to_json
 
         sleep 0.1
@@ -98,7 +98,7 @@ module PlaceOS::Model
         sleep 0.1
 
         # Check the state in redis
-        inst_store = PlaceOS::Driver::Storage.new(inst.id.not_nil!)
+        inst_store = PlaceOS::Driver::RedisStorage.new(inst.id.not_nil!)
         status = JSON.parse(inst_store["state"])
         status["triggered"].as_bool.should be_true
         status["trigger_count"].as_i.should eq(1)

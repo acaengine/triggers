@@ -41,7 +41,7 @@ module PlaceOS::Triggers
       @count = 0_i64
       @comparison_errors = 0_i64
       @action_errors = 0_i64
-      @storage = PlaceOS::Driver::Storage.new(@instance_id)
+      @storage = PlaceOS::Driver::RedisStorage.new(@instance_id)
       @storage.clear
       publish_state
 
