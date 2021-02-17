@@ -7,6 +7,7 @@ RUN apk update && apk add --no-cache ca-certificates tzdata && update-ca-certifi
 
 # Install shards for caching
 COPY shard.yml shard.yml
+COPY shard.override.yml shard.override.yml
 COPY shard.lock shard.lock
 
 RUN shards install --production
