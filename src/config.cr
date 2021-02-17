@@ -19,16 +19,13 @@ require "./placeos-triggers"
 require "action-controller/server"
 
 # Logging configuration
-if App.running_in_production?
-  log_level = Log::Severity::Info
-  Log.setup "*", :warning, App::LOG_BACKEND
-else
-  log_level = Log::Severity::Debug
-  Log.setup "*", :info, App::LOG_BACKEND
-end
-Log.builder.bind "action-controller.*", log_level, App::LOG_BACKEND
-Log.builder.bind "#{App::NAME}.*", log_level, App::LOG_BACKEND
-Log.builder.bind "e_mail.*", log_level, App::LOG_BACKEND
+log_level = App.running_in_production? ? Log::Severity::Info : Log::Severity::Debug
+log_backend = App.log_backend
+
+Log.setup "*", :warn, log_backend
+Log.builder.bind "action-controller.*", log_level, log_backend
+Log.builder.bind "#{App::NAME}.*", log_level, log_backend
+Log.builder.bind "e_mail.*", log_level, log_backend
 
 # Filter out sensitive params that shouldn't be logged
 filter_params = ["password", "bearer_token"]
@@ -37,7 +34,7 @@ keeps_headers = ["X-Request-ID"]
 # Add handlers that should run before your application
 ActionController::Server.before(
   ActionController::ErrorHandler.new(App.running_in_production?, keeps_headers),
-  ActionController::LogHandler.new(filter_params),
+  ActionController::LogHandler.new(filter_params, ms: true),
 )
 
 # Set SMTP client configuration
