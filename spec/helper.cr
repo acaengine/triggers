@@ -22,6 +22,11 @@ WebMock.stub(:post, "http://127.0.0.1:2379/v3beta/watch")
   .to_return(body_io: IO::Stapled.new(*IO.pipe))
 
 # Triggers code
+Log.setup "*", :trace, App::LOG_STDOUT
+Log.builder.bind "action-controller.*", :trace, App::LOG_STDOUT
+Log.builder.bind "#{App::NAME}.*", :trace, App::LOG_STDOUT
+Log.builder.bind "e_mail.*", :trace, App::LOG_STDOUT
+
 require "../src/config"
 require "../src/placeos-triggers"
 

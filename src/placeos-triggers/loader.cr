@@ -9,9 +9,8 @@ module PlaceOS::Triggers
 
     @trigger_cache = {} of String => Model::Trigger
     @trigger_map = {} of String => Array(State)
-    @instances = {} of String => State
 
-    getter instances
+    getter instances = {} of String => State
 
     def load!
       # This ensures the change feeds are live before we load the trigger instances
@@ -31,32 +30,36 @@ module PlaceOS::Triggers
 
     private def watch_triggers!
       Model::Trigger.changes.each do |change|
-        trigger = change[:value]
+        begin
+          trigger = change[:value]
 
-        Log.debug { {trigger: trigger.id, message: "trigger '#{trigger.name}' #{change[:event]}"} }
+          Log.debug { {trigger: trigger.id, message: "trigger '#{trigger.name}' #{change[:event]}"} }
 
-        case change[:event]
-        when RethinkORM::Changefeed::Event::Deleted
-          @trigger_cache.delete trigger.id
-          triggers = @trigger_map.delete(trigger.id)
-          triggers.try &.each do |state|
-            @instances.delete state.instance_id
-            state.terminate!
-          end
-        when RethinkORM::Changefeed::Event::Created
-          @trigger_cache[trigger.id.not_nil!] = trigger
-        when RethinkORM::Changefeed::Event::Updated
-          @trigger_cache[trigger.id.not_nil!] = trigger
-          states = @trigger_map.delete(trigger.id)
-          if states
-            states.each do |state|
-              instance = state.instance
-              @instances.delete(instance.id)
+          case change[:event]
+          in .deleted?
+            @trigger_cache.delete trigger.id
+            triggers = @trigger_map.delete(trigger.id)
+            triggers.try &.each do |state|
+              @instances.delete state.instance_id
               state.terminate!
+            end
+          in .created?
+            @trigger_cache[trigger.id.not_nil!] = trigger
+          in .updated?
+            @trigger_cache[trigger.id.not_nil!] = trigger
+            states = @trigger_map.delete(trigger.id)
+            if states
+              states.each do |state|
+                instance = state.instance
+                @instances.delete(instance.id)
+                state.terminate!
 
-              new_instance(trigger, instance)
+                new_instance(trigger, instance)
+              end
             end
           end
+        rescue error
+          Log.error(exception: error) { "trigger change failed" }
         end
       end
     rescue error
@@ -67,18 +70,22 @@ module PlaceOS::Triggers
 
     private def watch_instances!
       Model::TriggerInstance.changes.each do |change|
-        instance = change[:value]
+        begin
+          instance = change[:value]
 
-        Log.debug { {trigger: instance.trigger_id, instance: instance.id, system_id: instance.control_system_id, message: "trigger instance #{change[:event]}"} }
+          Log.debug { {trigger: instance.trigger_id, instance: instance.id, system_id: instance.control_system_id, message: "trigger instance #{change[:event]}"} }
 
-        case change[:event]
-        when RethinkORM::Changefeed::Event::Deleted
-          remove_instance(instance)
-        when RethinkORM::Changefeed::Event::Created
-          new_instance(instance)
-        when RethinkORM::Changefeed::Event::Updated
-          remove_instance(instance)
-          new_instance(instance)
+          case change[:event]
+          in .deleted?
+            remove_instance(instance)
+          in .created?
+            new_instance(instance)
+          in .updated?
+            remove_instance(instance)
+            new_instance(instance)
+          end
+        rescue error
+          Log.error(exception: error) { "instance change failed" }
         end
       end
     rescue error
@@ -103,8 +110,7 @@ module PlaceOS::Triggers
       trigger_id = trigger.id.not_nil!
       state = State.new trigger, instance
       @instances[instance.id.not_nil!] = state
-      states = @trigger_map[trigger_id]?
-      if states
+      if states = @trigger_map[trigger_id]?
         states << state
       else
         @trigger_map[trigger_id] = [state]
@@ -114,10 +120,8 @@ module PlaceOS::Triggers
     end
 
     def remove_instance(instance)
-      state = @instances[instance.id]?
-      if state
-        instances = @trigger_map[instance.trigger_id]?
-        instances.try &.delete(state)
+      if state = @instances[instance.id]?
+        @trigger_map[instance.trigger_id]?.try &.delete(state)
         state.terminate!
       end
 

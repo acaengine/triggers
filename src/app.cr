@@ -51,6 +51,7 @@ puts "Launching #{App::NAME} v#{App::VERSION}"
 
 # Requiring config here ensures that the option parser runs before
 # we attempt to connect to databases etc.
+require "./logging"
 require "./config"
 server = ActionController::Server.new(port, host)
 
