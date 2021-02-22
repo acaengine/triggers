@@ -1,0 +1,48 @@
+version: "3.7"
+
+# YAML Anchors
+
+x-deployment-env: &deployment-env
+  ENV: ${ENV:-development}
+  SG_ENV: ${SG_ENV:-development}
+  TZ: $TZ
+
+x-redis-client-env: &redis-client-env
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+
+x-rethinkdb-client-env: &rethinkdb-client-env
+  RETHINKDB_HOST: ${RETHINKDB_HOST:-rethink}
+  RETHINKDB_PORT: ${RETHINKDB_PORT:-28015}
+  RETHINKDB_DB: ${RETHINKDB_DB:-place_development}
+
+services:
+  test:
+    build:
+      context: ./
+      dockerfile: Dockerfile.test
+    volumes:
+      - ./spec:/app/spec
+      - ./src:/app/src
+    depends_on:
+      - redis
+      - rethink
+    environment:
+      # Service Hosts
+      << : *redis-client-env
+      << : *rethinkdb-client-env
+      # Environment
+      << : *deployment-env
+
+  redis:
+    image: eqalpha/keydb
+    restart: always
+    hostname: redis
+    environment:
+      TZ: $TZ
+
+  rethink:
+    image: rethinkdb:${RETHINKDB_VERSION:-2.4}
+    restart: always
+    hostname: rethink
+    environment:
+      TZ: $TZ
