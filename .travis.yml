@@ -2,15 +2,6 @@ language: crystal
 
 services:
   - docker
-  - redis-server
-
-before_install:
-  # Add rethinkdb
-  - docker run --net="host" -p "29015:29015" -p "28015:28015" -d rethinkdb:2.4
-
-install:
-  - shards install
 
 script:
-  - crystal spec -v --error-trace
-  - crystal tool format --check
+  - ./test
