@@ -3,6 +3,7 @@ require "spec"
 require "base64"
 require "random"
 require "webmock"
+require "placeos-log-backend"
 require "rethinkdb-orm"
 
 # Prepare for node discovery
@@ -22,10 +23,10 @@ WebMock.stub(:post, "http://127.0.0.1:2379/v3beta/watch")
   .to_return(body_io: IO::Stapled.new(*IO.pipe))
 
 # Triggers code
-Log.setup "*", :trace, App::LOG_STDOUT
-Log.builder.bind "action-controller.*", :trace, App::LOG_STDOUT
-Log.builder.bind "#{App::NAME}.*", :trace, App::LOG_STDOUT
-Log.builder.bind "e_mail.*", :trace, App::LOG_STDOUT
+Log.setup "*", :trace, PlaceOS::LogBackend::LOG_STDOUT
+Log.builder.bind "action-controller.*", :trace, PlaceOS::LogBackend::LOG_STDOUT
+Log.builder.bind "#{App::NAME}.*", :trace, PlaceOS::LogBackend::LOG_STDOUT
+Log.builder.bind "e_mail.*", :trace, PlaceOS::LogBackend::LOG_STDOUT
 
 require "../src/config"
 require "../src/placeos-triggers"

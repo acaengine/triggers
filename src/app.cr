@@ -1,5 +1,7 @@
-require "option_parser"
 require "http/client"
+require "option_parser"
+require "placeos-log-backend"
+
 require "./constants"
 
 # Server defaults
@@ -72,7 +74,7 @@ Signal::TERM.trap &terminate
 # Allow signals to change the log level at run-time
 logging = Proc(Signal, Nil).new do |signal|
   log_level = signal.usr1? ? Log::Severity::Debug : Log::Severity::Info
-  log_backend = App.log_backend
+  log_backend = P
   puts " > Log level changed to #{log_level}"
   Log.builder.bind "action-controller.*", log_level, log_backend
   Log.builder.bind "#{App::NAME}.*", log_level, log_backend

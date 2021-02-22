@@ -18,6 +18,10 @@ dependencies:
   placeos-models:
     github: placeos/models
 
+  # Log Backend
+  placeos-log-backend:
+    github: placeos/log-backend
+
   # Tagged logging
   log_helper:
     github: spider-gazelle/log_helper

@@ -1,37 +1,11 @@
 require "secrets-env"
+require "placeos-log-backend"
 
 module App
   NAME    = "triggers"
   VERSION = {{ `shards version "#{__DIR__}"`.chomp.stringify.downcase }}
 
-  Log           = ::Log.for(NAME)
-  LOG_STDOUT    = ActionController.default_backend
-  LOGSTASH_HOST = ENV["LOGSTASH_HOST"]?
-  LOGSTASH_PORT = ENV["LOGSTASH_PORT"]?
-
-  def self.log_backend
-    if logstash_host = LOGSTASH_HOST.presence
-      logstash_port = LOGSTASH_PORT.try(&.to_i?) || abort("LOGSTASH_PORT is either malformed or not present in environment")
-
-      # Logstash UDP Input
-      logstash = UDPSocket.new
-      logstash.connect logstash_host, logstash_port
-      logstash.sync = false
-
-      # debug at the broadcast backend level, however this will be filtered
-      # by the bindings
-      backend = ::Log::BroadcastBackend.new
-      backend.append(LOG_STDOUT, :trace)
-      backend.append(ActionController.default_backend(
-        io: logstash,
-        formatter: ActionController.json_formatter
-      ), :trace)
-      backend
-    else
-      LOG_STDOUT
-    end
-  end
-
+  Log         = ::Log.for(NAME)
   ENVIRONMENT = ENV["SG_ENV"]? || "development"
 
   DEFAULT_PORT          = (ENV["SG_SERVER_PORT"]? || 3000).to_i
@@ -44,12 +18,15 @@ module App
   SMTP_PASS   = ENV["SMTP_PASS"]? || ""
   SMTP_SECURE = ENV["SMTP_SECURE"]? || ""
 
-  CORE_NAMESPACE = "core"
-  CORE_DISCOVERY = HoundDog::Discovery.new(CORE_NAMESPACE)
+  # HoundDog Configuration.
+  # ----------------------------------
+  # ETCD_HOST (default: "127.0.0.1")
+  # ETCD_PORT (default: 2379)
+  # ETCD_TTL  (default: 15)
 
-  def self.discovery
-    CORE_DISCOVERY
-  end
+  CORE_NAMESPACE = "core"
+
+  class_getter discovery : HoundDog::Discovery { HoundDog::Discovery.new(CORE_NAMESPACE) }
 
   def self.smtp_authenticated?
     !SMTP_USER.empty?

@@ -105,6 +105,10 @@ shards:
     git: https://github.com/placeos/driver.git
     version: 4.2.0
 
+  placeos-log-backend:
+    git: https://github.com/placeos/log-backend.git
+    version: 0.1.0
+
   placeos-models:
     git: https://github.com/placeos/models.git
     version: 4.12.1
